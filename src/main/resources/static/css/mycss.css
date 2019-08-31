@@ -1,0 +1,14 @@
+body{
+    background-color: #efefef;
+}
+.img-circle{
+    width: 45px;
+}
+.media-body{
+    font-size: 12px;
+    font-weight: normal;
+    color: #999;
+}
+/*hr{*/
+/*     margin: 10px;*/
+/* }*/

@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>南酱社区--问题详情</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script src="/jquery/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/mycss.css">
+    <script>
+        function post() {
+            var to = $("#questionId").val();
+            var text = $("#text").val();
+            if (text == "") {
+                alert("输入回复");
+            } else {
+                $.ajax({
+                    type: "post",
+                    url: "/comment",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "type": 0,
+                        "commentTo": to,
+                        "commentText": text
+                    }),
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == "success") {
+                            window.location.reload();
+                        }
+                    }
+                });
+            }
+        }
+
+        function post1(id) {
+            var text = $("#" + id).val();
+            if (text == "") {
+                alert("输入回复");
+            } else {
+                $.ajax({
+                    type: "post",
+                    url: "/comment",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "type": 1,
+                        "commentTo": id,
+                        "commentText": text
+                    }),
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.type == "success") {
+                            window.location.reload();
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</head>
+<body style="background-color: #efefef">
+<!--顶部-->
+<div th:insert="~{index::top}"></div>
+<!--主界面-->
+<div class="container-fluid" style="margin: 30px;background-color: white">
+    <div class="row">
+        <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+            <h2 style="margin-bottom: 0px"><span th:text="${questionDto.question.title}"></span></h2>
+            <span style="font-size: 13px;font-weight: normal;color: #999;" th:text="'创建人：'+${questionDto.user.getName()}+'|发布时间:'
+            +${#dates.format(questionDto.question.gmtCreate,'yyyy-MM-dd HH:mm  ')}+'|'+${questionDto.question.viewCount}+'次浏览 '"></span>
+            <a
+                    th:if="${questionDto.question.creator==session.user.id}"
+                    th:href="'/publish/'+${questionDto.question.id}"
+                    style="color: #999;font-size: 13px;margin-bottom: 15px;"><span
+                    class="glyphicon glyphicon-pencil" aria-hidden="true">编辑</span></a>
+            <a th:if="${questionDto.question.creator==session.user.id}" href="#"
+               style="color: #999;font-size: 13px;margin-bottom: 15px;"><span
+                    class="glyphicon glyphicon-remove" aria-hidden="true">删除</span></a>
+            <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <span th:text="${questionDto.question.description}"></span>
+            </div>
+            <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <span class="label label-info" th:each="tag:${questionDto.question.tag.split(',')}"
+                      style="margin-right: 5px;padding-left: 5px;padding-top: 4px">
+                    <span class="glyphicon glyphicon-tags" aria-hidden="true"><span th:text="' '+${tag}"></span></span>
+                </span>
+            </div>
+            <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <h3 style="margin-bottom: 0px"><span th:text="${questionDto.question.commentCount}+'个回复'"></span></h3>
+            <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 10px">
+            <h4><span th:if="${#lists.isEmpty(commentResponseDtoListQ)}">还没有人回复，赶紧来回复吧！</span></h4>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding-bottom: 20px;"
+                 th:each="commentResponseDtoQ:${commentResponseDtoListQ}">
+                <ul class="media-list">
+                    <li class="media">
+                        <div class="media-left">
+                            <a href="#">
+                                <img class="img-circle" style="width: 35px"
+                                     th:src="${commentResponseDtoQ.user.avatarUrl}">
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading" style="margin-top: 10px"
+                                th:text="${commentResponseDtoQ.user.name}"></h4>
+                            <input type="hidden" th:value="${commentResponseDtoQ.comment.id}" id="comment_id">
+                            <span th:text="${commentResponseDtoQ.comment.commentText}"></span>
+                            <div style="margin-top: 10px">
+                                <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"
+                                      th:text="${commentResponseDtoQ.comment.likeCount}"></span>
+                                <span class="glyphicon glyphicon-comment" aria-hidden="true"
+                                      th:text="${commentResponseDtoQ.comment.commentCount}"></span>
+                                <span th:text="${#dates.format(commentResponseDtoQ.comment.gmtCreate,'yyyy-MM-dd HH:mm')}"
+                                      style="float: right"></span>
+                            </div>
+                            <!--                            二级评论-->
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="border: 1px solid #eee;">
+                                <div th:each="commentResponseDtoC:${commentResponseDtoListC}"
+                                     th:if="${commentResponseDtoC.comment.commentTo}==${commentResponseDtoQ.comment.id}">
+                                    <div class="media-left" style="padding-top: 10px;">
+                                        <a href="#">
+                                            <img class="img-circle" style="width: 35px"
+                                                 th:src="${commentResponseDtoC.user.avatarUrl}">
+                                        </a>
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading" style="margin-top: 22px"
+                                            th:text="${commentResponseDtoC.user.name}"></h4>
+                                        <span th:text="${commentResponseDtoC.comment.commentText}">回复内容</span>
+                                        <div style="margin-top: 0px">
+                                            <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"
+                                                  th:text="${commentResponseDtoC.comment.likeCount}"></span>
+                                            <span class="glyphicon glyphicon-comment" aria-hidden="true"
+                                                  th:text="${commentResponseDtoC.comment.commentCount}"></span>
+                                            <span th:text="${#dates.format(commentResponseDtoC.comment.gmtCreate,'yyyy-MM-dd HH:mm')}"
+                                                  style="float: right"></span>
+                                        </div>
+                                    </div>
+                                    <hr style="margin: 5px">
+                                </div>
+                                <input type="text" class="form-control" placeholder="评论一下"
+                                       aria-describedby="basic-addon1" style="margin-top: 10px"
+                                       th:id="${commentResponseDtoQ.comment.id}">
+                                <button type="button" class="btn btn-success" style="float: right;margin: 10px"
+                                        th:onclick="'javascript:post1(\''+${commentResponseDtoQ.comment.id}+'\')'">评论
+                                </button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 0px">
+            </div>
+            <h3 style="margin-bottom: 0px"><span th:text="提交回复"></span></h3>
+            <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 10px">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="form-group">
+                    <span th:if="${session.user==null}">匿名回复..</span>
+                    <span th:if="${session.user!=null}"><a href="#"><img class="img-circle"
+                                                                         th:src="${session.user.getAvatarUrl()}">&nbsp;&nbsp;&nbsp;</a></span>
+                    <span th:if="${session.user!=null}" th:text="${session.user.getName()}"></span>
+                </div>
+                <div>
+                    <input type="hidden" id="questionId" th:value="${questionDto.question.id}">
+                    <textarea class="form-control" id="text" rows="5"
+                              placeholder="输入回复....."></textarea>
+                    <button class="btn btn-success" style="float: right;margin: 10px" id="submit" onclick="post()">回复
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!--        发起人-->
+        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+            <h2><span>发起人:</span></h2>
+            <span><img class="img-circle" th:src="${questionDto.user.getAvatarUrl()}">&nbsp;&nbsp;</span>
+            <span th:text="${questionDto.user.getName()}"></span>
+            <hr>
+        </div>
+        <!--        广告-->
+        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+            <h2><span>发起人:</span></h2>
+            <span><img class="img-circle" th:src="${questionDto.user.getAvatarUrl()}">&nbsp;&nbsp;</span>
+            <span th:text="${questionDto.user.getName()}"></span>
+            <hr>
+        </div>
+        <!--        相关问题-->
+        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+            <h4><span class="glyphicon glyphicon-paperclip" aria-hidden="true">相关问题:</span></h4>
+            <hr style="margin: 5px">
+            <h5 th:each="question:${questionList}"><span class="glyphicon glyphicon-map-marker"
+                                                         aria-hidden="true"></span><a th:text="${question.title}"
+                                                                                      th:href="'/question/'+${question.id}"></a>
+            </h5>
+        </div>
+    </div>
+</div>
+</body>
+</html>
