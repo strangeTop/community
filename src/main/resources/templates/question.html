@@ -9,12 +9,12 @@
     <script src="/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/css/mycss.css">
     <script>
-        function post() {
+        function post(user) {
             var to = $("#questionId").val();
             var text = $("#text").val();
             if (text == "") {
                 alert("请输入回复");
-            }else if(sessionStorage.getItem("user")==null){
+            }else if(user==null){
                 alert("请登录");
             } else {
                 $.ajax({
@@ -39,11 +39,11 @@
             }
         }
 
-        function post1(id) {
+        function post1(id,user) {
             var text = $("#" + id).val();
             if (text == "") {
                 alert("请输入评论");
-            }else if(sessionStorage.getItem("user")==null){
+            }else if(user==null){
                 alert("请登录");
 
             }else {
@@ -156,7 +156,7 @@
                                        aria-describedby="basic-addon1" style="margin-top: 10px"
                                        th:id="${commentResponseDtoQ.comment.id}">
                                 <button type="button" class="btn btn-success" style="float: right;margin: 10px"
-                                        th:onclick="'javascript:post1(\''+${commentResponseDtoQ.comment.id}+'\')'">评论
+                                        th:onclick="post1([[${commentResponseDtoQ.comment.id}]],[[${session.user}]])">评论
                                 </button>
                             </div>
                         </div>
@@ -177,7 +177,7 @@
                     <input type="hidden" id="questionId" th:value="${questionDto.question.id}">
                     <textarea class="form-control" id="text" rows="5"
                               placeholder="输入回复....."></textarea>
-                    <button class="btn btn-success" style="float: right;margin: 10px" id="submit" onclick="post()">回复
+                    <button class="btn btn-success" style="float: right;margin: 10px" id="submit" th:onclick="post([[${session.user}]])">回复
                     </button>
                 </div>
             </div>

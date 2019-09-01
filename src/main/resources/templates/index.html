@@ -33,7 +33,7 @@
                 </form>
                 <ul class="nav navbar-nav navbar-right">
                     <li th:if="${session.user==null}"><a
-                        th:href="@{https://github.com/login/oauth/authorize(client_id='e91ada3f60ce49ec8d00',redirect_uri=${#httpServletRequest.getRequestURL()+'callback'},scope='user',state=1)}">登录</a>
+                            th:href="@{https://github.com/login/oauth/authorize(client_id='e91ada3f60ce49ec8d00',redirect_uri=${#httpServletRequest.getScheme()+'://'+#httpServletRequest.getServerName()+':'+#httpServletRequest.getServerPort()+#httpServletRequest.getContextPath()+'/callback'},scope='user',state=1)}">登录</a>
                     </li>
                     <li th:if="${session.user!=null}"><a href="/publish">我要发帖</a></li>
                     <li class="dropdown" th:if="${session.user!=null}">
@@ -67,7 +67,8 @@
                     </a>
                 </div>
                 <div class="media-body">
-                    <h4 class="media-heading"><a th:href="@{'/question/'+${questionDto.question.id}}" th:text="${questionDto.question.title}"></a></h4>
+                    <h4 class="media-heading"><a th:href="@{'/question/'+${questionDto.question.id}}"
+                                                 th:text="${questionDto.question.title}"></a></h4>
                     <span th:text="${questionDto.question.commentCount}+' 个回复 • '+${questionDto.question.viewCount}+' 次浏览 • '+${#dates.format(questionDto.question.gmtCreate,'yyyy-MM-dd HH:mm  ')}"></span>
                 </div>
             </div>
@@ -84,7 +85,8 @@
                             <span aria-hidden="true">上一页</span>
                         </a>
                     </li>
-                    <li th:each="page:${pageDto.pageList}"  th:class="${pageDto.page==page}?'active':'disable'"><a th:href="@{/(page=${page})}" th:text="${page}"></a></li>
+                    <li th:each="page:${pageDto.pageList}" th:class="${pageDto.page==page}?'active':'disable'"><a
+                            th:href="@{/(page=${page})}" th:text="${page}"></a></li>
                     <li th:if="${pageDto.showNext}">
                         <a th:href="@{/(page=${pageDto.page}+1)}" aria-label="Next">
                             <span aria-hidden="true">下一页</span>
@@ -97,7 +99,7 @@
                     </li>
                 </ul>
             </nav>
-        </div >
+        </div>
         <!--        右侧-->
         <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
             <h3>问题发起指南:</h3><br>
