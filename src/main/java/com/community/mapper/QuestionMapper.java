@@ -15,7 +15,7 @@ public interface QuestionMapper {
     @Insert("insert into question (title,description,tag,gmt_create,gmt_modified,creator) value(#{title},#{description},#{tag},#{gmtCreate},#{gmtModified},#{creator})")
     public void create(Question question);
 
-    @Select("select * from question limit #{page},#{size}")
+    @Select("select * from question order by gmt_create desc limit #{page},#{size}")
     List<Question> selectAll(@RequestParam(value = "page") Integer page, @RequestParam(value = "size") Integer size);
 
     @Select("select count(1) from question")
@@ -24,7 +24,7 @@ public interface QuestionMapper {
     @Select("select count(1) from question where creator=#{id}")
     Integer getTotalById(@RequestParam(value = "id")Integer id);
 
-    @Select("select * from question where creator=#{id} limit #{page},#{size}")
+    @Select("select * from question where creator=#{id} order by gmt_create desc limit #{page},#{size}")
     List<Question> selectByCreateId(@RequestParam(value = "page")int page, @RequestParam(value = "size")Integer size, @RequestParam(value = "id")Integer id);
 
     @Select("select * from question where id=#{id}")
@@ -36,7 +36,7 @@ public interface QuestionMapper {
     @Update("update question set comment_count=comment_count+1 where id=#{id}")
     void updateComment(@RequestParam(value = "id") Integer commentTo);
 
-    @Select("SELECT * FROM question WHERE tag REGEXP #{tag} and id!=#{id}")
+    @Select("SELECT * FROM question  WHERE tag REGEXP #{tag} and id!=#{id} limit 20")
     List<Question> selectByTag(@RequestParam(value = "tag") String tag,@RequestParam(value = "id")Integer id);
 
     @Update("update question set title=#{title},description=#{description},tag=#{tag} where id=#{id}")

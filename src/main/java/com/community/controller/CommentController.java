@@ -26,7 +26,7 @@ public class CommentController {
         User user = (User)request.getSession().getAttribute("user");
         if(user==null){
             hashMap.put("type","fail");
-            hashMap.put("msg","未登录");
+            hashMap.put("msg","请登录");
             return hashMap;
         }
         Integer creator=user.getId();

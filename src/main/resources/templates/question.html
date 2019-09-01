@@ -13,7 +13,9 @@
             var to = $("#questionId").val();
             var text = $("#text").val();
             if (text == "") {
-                alert("输入回复");
+                alert("请输入回复");
+            }else if(sessionStorage.getItem("user")==null){
+                alert("请登录");
             } else {
                 $.ajax({
                     type: "post",
@@ -29,6 +31,9 @@
                         if (data.type == "success") {
                             window.location.reload();
                         }
+                        if(data.type=="fail"){
+                            alert(data.msg);
+                        }
                     }
                 });
             }
@@ -37,8 +42,11 @@
         function post1(id) {
             var text = $("#" + id).val();
             if (text == "") {
-                alert("输入回复");
-            } else {
+                alert("请输入评论");
+            }else if(sessionStorage.getItem("user")==null){
+                alert("请登录");
+
+            }else {
                 $.ajax({
                     type: "post",
                     url: "/comment",
@@ -53,10 +61,14 @@
                         if (data.type == "success") {
                             window.location.reload();
                         }
+                        if(data.type=="fail"){
+                            alert(data.msg);
+                        }
                     }
                 });
             }
         }
+
     </script>
 </head>
 <body style="background-color: #efefef">
@@ -70,11 +82,11 @@
             <span style="font-size: 13px;font-weight: normal;color: #999;" th:text="'创建人：'+${questionDto.user.getName()}+'|发布时间:'
             +${#dates.format(questionDto.question.gmtCreate,'yyyy-MM-dd HH:mm  ')}+'|'+${questionDto.question.viewCount}+'次浏览 '"></span>
             <a
-                    th:if="${questionDto.question.creator==session.user.id}"
+                    th:if="${session.user!=null && questionDto.question.creator==session.user.id}"
                     th:href="'/publish/'+${questionDto.question.id}"
                     style="color: #999;font-size: 13px;margin-bottom: 15px;"><span
                     class="glyphicon glyphicon-pencil" aria-hidden="true">编辑</span></a>
-            <a th:if="${questionDto.question.creator==session.user.id}" href="#"
+            <a th:if="${session.user!=null &&questionDto.question.creator==session.user.id}" href="#"
                style="color: #999;font-size: 13px;margin-bottom: 15px;"><span
                     class="glyphicon glyphicon-remove" aria-hidden="true">删除</span></a>
             <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
